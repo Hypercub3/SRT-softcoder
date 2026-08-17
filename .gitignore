@@ -1,0 +1,32 @@
+# Python caches and local environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Editor and operating-system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Local logs and generated output
+*.log
+*_softcoded.mp4
+*_softcoded.m4v
+*_softcoded.mov
+*_softcoded.mkv
+*_softcoded.webm
+
+# Local development snapshots and archives
+/1 mp4 only output/
+/2 keep same output format/
+/3 bf preserve subtiltes checkbox/
+/4 preserve subtitles checkbox bf new subtitle last/
+/5 subtitle last/
+/SRT softcoder.zip

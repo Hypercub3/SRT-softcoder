@@ -98,11 +98,3 @@ The newly added subtitle track uses a codec that depends on the output container
 ```
 
 That keeps the original video and audio streams intact while adding the new subtitle track as the last selectable subtitle. Existing subtitle tracks from the source video are copied before the newly added subtitle track by default. Converting styled ASS/SSA subtitles to MP4 or WebM can lose styling because those containers use simpler text subtitle formats, and some existing subtitle formats may not be compatible with every output container.
-
-## Tests
-
-Run the built-in tests with:
-
-```powershell
-python -m unittest discover -s tests
-```

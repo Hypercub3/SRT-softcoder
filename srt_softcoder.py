@@ -81,6 +81,7 @@ class SrtSoftcoderApp:
         self.output_as_mp4 = tk.BooleanVar(value=False)
         self.overwrite_output = tk.BooleanVar(value=False)
         self.status = tk.StringVar(value="Choose a video and subtitle file.")
+        self._last_default_output = ""
 
         self.event_queue: queue.Queue[tuple[str, object]] = queue.Queue()
         self.worker: threading.Thread | None = None
@@ -570,31 +571,25 @@ class SrtSoftcoderApp:
 
     def _maybe_set_default_output(self) -> None:
         current = self.output_path.get().strip()
-        if current:
-            return
         default = self._default_output_path()
-        if default:
+        if default and (
+            not current
+            or self._normalize_path(Path(current))
+            == self._normalize_path(Path(self._last_default_output))
+        ):
             self.output_path.set(default)
+        self._last_default_output = default
 
     def _handle_output_format_change(self) -> None:
         current = self.output_path.get().strip()
-        if current and not self._is_default_output_path(current):
-            return
         default = self._default_output_path()
-        if default:
+        if default and (
+            not current
+            or self._normalize_path(Path(current))
+            == self._normalize_path(Path(self._last_default_output))
+        ):
             self.output_path.set(default)
-
-    def _is_default_output_path(self, output: str) -> bool:
-        video = self.video_path.get().strip()
-        if not video:
-            return False
-        path = Path(video)
-        suffixes = {self._default_output_suffix_for_video(path.suffix.lower()), ".mp4"}
-        candidates = {
-            self._normalize_path(path.with_name(f"{path.stem}_softcoded{suffix}"))
-            for suffix in suffixes
-        }
-        return self._normalize_path(Path(output)) in candidates
+        self._last_default_output = default
 
     def _normalize_path(self, path: Path) -> str:
         return os.path.normcase(os.path.abspath(path))

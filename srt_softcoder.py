@@ -142,22 +142,13 @@ class SrtSoftcoderApp:
 
         options = ttk.Frame(drop_frame)
         options.grid(row=3, column=0, columnspan=3, sticky="ew", pady=(14, 0))
-        options.columnconfigure(3, weight=1)
+        options.columnconfigure(5, weight=1)
 
         ttk.Label(options, text="Subtitle language").grid(row=0, column=0, sticky="w")
         language_entry = ttk.Entry(options, width=8, textvariable=self.language)
         language_entry.grid(row=0, column=1, sticky="w", padx=(8, 24))
-        ttk.Checkbutton(
-            options,
-            text="Output as MP4",
-            variable=self.output_as_mp4,
-            command=self._handle_output_format_change,
-        ).grid(
-            row=0, column=2, sticky="w"
-        )
-
         ttk.Label(options, text="Insert subtitle").grid(
-            row=1, column=0, sticky="w", pady=(8, 0)
+            row=0, column=2, sticky="w"
         )
         subtitle_position_menu = ttk.Combobox(
             options,
@@ -166,20 +157,28 @@ class SrtSoftcoderApp:
             textvariable=self.subtitle_position,
             values=SUBTITLE_POSITIONS,
         )
-        subtitle_position_menu.grid(row=1, column=1, sticky="w", padx=(8, 24), pady=(8, 0))
+        subtitle_position_menu.grid(row=0, column=3, sticky="w", padx=(8, 24))
+        ttk.Checkbutton(
+            options,
+            text="Output as MP4",
+            variable=self.output_as_mp4,
+            command=self._handle_output_format_change,
+        ).grid(
+            row=1, column=0, columnspan=2, sticky="w", pady=(8, 0)
+        )
         ttk.Checkbutton(
             options,
             text="Remove existing subtitles",
             variable=self.remove_existing_subtitles,
         ).grid(
-            row=2, column=0, columnspan=2, sticky="w", pady=(8, 0)
+            row=1, column=2, columnspan=2, sticky="w", padx=(24, 0), pady=(8, 0)
         )
         ttk.Checkbutton(
             options,
             text="Overwrite existing output",
             variable=self.overwrite_output,
         ).grid(
-            row=2, column=2, sticky="w", pady=(8, 0)
+            row=1, column=4, columnspan=2, sticky="w", padx=(24, 0), pady=(8, 0)
         )
 
         dnd_text = (

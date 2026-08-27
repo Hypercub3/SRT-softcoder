@@ -60,8 +60,9 @@ python srt_softcoder.py
 2. Choose or drag in a supported subtitle file.
 3. Confirm the output path.
 4. Check **Output as MP4** to create an `.mp4` output instead of keeping the input format.
-5. Leave **Remove existing subtitles** unchecked to preserve subtitle tracks that are already in the video, or check it to drop them.
-6. Click **Softcode Subtitles**.
+5. Choose whether to insert the new subtitle **First** or **Last** among the subtitle tracks. **Last** is the default.
+6. Leave **Remove existing subtitles** unchecked to preserve subtitle tracks that are already in the video, or check it to drop them.
+7. Click **Softcode Subtitles**.
 
 Supported input video files:
 
@@ -81,13 +82,14 @@ Supported output files:
 .mp4, .m4v, .mov, .mkv, .webm
 ```
 
-The app uses this stream strategy:
+By default, the app uses this stream strategy to add the subtitle last:
 
 ```text
 -map 0:v? -map 0:a? -map 0:s? -map 1:0 -c:v copy -c:a copy -c:s copy
 ```
 
 When **Remove existing subtitles** is checked, the `-map 0:s?` step is skipped.
+When **First** is selected, `-map 1:0` is placed before `-map 0:s?`, and the new subtitle's codec and language metadata are applied to subtitle stream 0.
 
 The newly added subtitle track uses a codec that depends on the output container:
 
@@ -97,4 +99,4 @@ The newly added subtitle track uses a codec that depends on the output container
 .webm            -> webvtt
 ```
 
-That keeps the original video and audio streams intact while adding the new subtitle track as the last selectable subtitle. Existing subtitle tracks from the source video are copied before the newly added subtitle track by default. Converting styled ASS/SSA subtitles to MP4 or WebM can lose styling because those containers use simpler text subtitle formats, and some existing subtitle formats may not be compatible with every output container.
+That keeps the original video and audio streams intact while adding the new subtitle track in the selected position. Existing subtitle tracks from the source video are preserved unless **Remove existing subtitles** is checked. Converting styled ASS/SSA subtitles to MP4 or WebM can lose styling because those containers use simpler text subtitle formats, and some existing subtitle formats may not be compatible with every output container.

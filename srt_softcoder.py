@@ -64,6 +64,7 @@ MP4_OUTPUT_FILETYPES = [
     ("MP4 files", "*.mp4"),
     ("All files", "*.*"),
 ]
+SUBTITLE_POSITIONS = ("First", "Last")
 
 
 class SrtSoftcoderApp:
@@ -77,6 +78,7 @@ class SrtSoftcoderApp:
         self.srt_path = tk.StringVar()
         self.output_path = tk.StringVar()
         self.language = tk.StringVar(value="eng")
+        self.subtitle_position = tk.StringVar(value="Last")
         self.remove_existing_subtitles = tk.BooleanVar(value=False)
         self.output_as_mp4 = tk.BooleanVar(value=False)
         self.overwrite_output = tk.BooleanVar(value=False)
@@ -153,19 +155,31 @@ class SrtSoftcoderApp:
         ).grid(
             row=0, column=2, sticky="w"
         )
+
+        ttk.Label(options, text="Insert subtitle").grid(
+            row=1, column=0, sticky="w", pady=(8, 0)
+        )
+        subtitle_position_menu = ttk.Combobox(
+            options,
+            width=8,
+            state="readonly",
+            textvariable=self.subtitle_position,
+            values=SUBTITLE_POSITIONS,
+        )
+        subtitle_position_menu.grid(row=1, column=1, sticky="w", padx=(8, 24), pady=(8, 0))
         ttk.Checkbutton(
             options,
             text="Remove existing subtitles",
             variable=self.remove_existing_subtitles,
         ).grid(
-            row=1, column=0, columnspan=2, sticky="w", pady=(8, 0)
+            row=2, column=0, columnspan=2, sticky="w", pady=(8, 0)
         )
         ttk.Checkbutton(
             options,
             text="Overwrite existing output",
             variable=self.overwrite_output,
         ).grid(
-            row=1, column=2, sticky="w", pady=(8, 0)
+            row=2, column=2, sticky="w", pady=(8, 0)
         )
 
         dnd_text = (
@@ -358,6 +372,8 @@ class SrtSoftcoderApp:
         existing_subtitle_count = (
             self._probe_subtitle_count(ffprobe_path, video) if preserve_existing_subtitles else 0
         )
+        insert_subtitle_first = self.subtitle_position.get() == "First"
+        new_subtitle_index = 0 if insert_subtitle_first else existing_subtitle_count
         output_suffix = output.suffix.lower()
         subtitle_suffix = srt.suffix.lower()
         command = [
@@ -372,9 +388,14 @@ class SrtSoftcoderApp:
             "-map",
             "0:a?",
         ]
-        if preserve_existing_subtitles:
-            command.extend(["-map", "0:s?"])
-        command.extend(["-map", "1:0"])
+        if insert_subtitle_first:
+            command.extend(["-map", "1:0"])
+            if preserve_existing_subtitles:
+                command.extend(["-map", "0:s?"])
+        else:
+            if preserve_existing_subtitles:
+                command.extend(["-map", "0:s?"])
+            command.extend(["-map", "1:0"])
         command.extend(
             [
                 "-map_metadata",
@@ -387,9 +408,9 @@ class SrtSoftcoderApp:
                 "copy",
                 "-c:s",
                 "copy",
-                f"-c:s:{existing_subtitle_count}",
+                f"-c:s:{new_subtitle_index}",
                 self._subtitle_codec(output_suffix, subtitle_suffix),
-                f"-metadata:s:s:{existing_subtitle_count}",
+                f"-metadata:s:s:{new_subtitle_index}",
                 f"language={self.language.get().strip() or 'und'}",
             ]
         )
